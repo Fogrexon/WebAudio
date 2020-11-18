@@ -7,5 +7,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - id: init
+        run: npm i
       - id: build
         run: npm run build
