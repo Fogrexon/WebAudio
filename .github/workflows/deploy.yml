@@ -3,12 +3,9 @@ on:
   push:
     branches:
       - master
-    tags:
-      - "!*"
 jobs:
   release:
-    name: check version, add tag and release
     runs-on: ubuntu-latest
     steps:
-      - name: build
+      - id: build
         run: npm run build
