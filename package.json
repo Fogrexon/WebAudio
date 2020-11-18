@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel ./public/index.html",
-    "build": "parcel build ./public/index.html --out-dir ./page/"
+    "build": "parcel build ./public/index.html --out-dir ./page/ --public-url ./XmasDJ/page/"
   },
   "repository": {
     "type": "git",
