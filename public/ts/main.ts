@@ -1,17 +1,13 @@
-const startSound = () => {
-  const context = new AudioContext();
+/* eslint-disable array-callback-return */
+import Instrument from './instruments/instrument';
+import { range } from './utils';
 
-  const oscillator = context.createOscillator();
+const inst = new Instrument(261.626, 120);
+inst.volume = 0.2;
 
-  window.setTimeout(() => {
-    oscillator.stop(0);
-  }, 60 * 1000);
-  
-  const gain = context.createGain();
-  
-  oscillator.connect(gain);
-  gain.connect(context.destination);
-  oscillator.start(0);
-};
-
-document.getElementById('button').addEventListener('click', startSound, false);
+document.getElementById('button').addEventListener('click', () => {
+  let chain = inst.play(-7, 0);
+  range(-7, 14).map((index) => {
+    chain = chain.then(() => inst.play(index, 1));
+  });
+});
