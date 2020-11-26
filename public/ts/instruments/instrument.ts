@@ -2,6 +2,7 @@ import { range } from '../utils';
 
 const pow12 = 2 ** (1 / 12);
 const doremi = [0, 2, 4, 5, 7, 9, 11];
+const sharp = [1, 3, 4, 6, 8, 10, 11];
 
 const notesGenerator = (_base: number) => {
   const notes = range(-12, 24).map((num) => _base * pow12 ** num);
@@ -9,7 +10,7 @@ const notesGenerator = (_base: number) => {
     const oct = Math.floor(note / 7);
     const index = (() => {
       if (note % 1 === 0.5) {
-        return doremi[note - oct * 7 - 0.5] + 1 + oct * 12;
+        return sharp[note - oct * 7 - 0.5] + oct * 12;
       }
       return doremi[note - oct * 7] + oct * 12;
     })();
