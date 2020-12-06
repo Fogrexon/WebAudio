@@ -1,4 +1,5 @@
 import { range } from '../utils';
+import Envelope from './envelope';
 
 const pow12 = 2 ** (1 / 12);
 const doremi = [0, 2, 4, 5, 7, 9, 11];
@@ -23,14 +24,17 @@ export default class Instrument {
 
   context: AudioContext;
 
-  volume: number = 1;
-
   bpm: number;
 
-  constructor(_base, bpm) {
+  waveType: string = 'sine';
+
+  envelope: Envelope;
+
+  constructor(_base, bpm, envelope: Envelope) {
     this.notes = notesGenerator(_base);
     this.context = new AudioContext();
     this.bpm = bpm;
+    this.envelope = envelope;
   }
 
   play(index: number, length: number): Promise<void> {
@@ -43,8 +47,9 @@ export default class Instrument {
     }
     const oscillator = this.context.createOscillator();
     oscillator.frequency.value = this.notes(index);
+    oscillator.type = this.waveType;
     const gain = this.context.createGain();
-    gain.gain.value = this.volume;
+    this.envelope.setEnvelope(gain, this.context.currentTime, (60000 / this.bpm) * length);
 
     oscillator.connect(gain);
     gain.connect(this.context.destination);
