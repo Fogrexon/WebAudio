@@ -30,7 +30,9 @@ export default class Instrument {
 
   envelope: Envelope;
 
-  constructor(_base, bpm, envelope: Envelope) {
+  public volume: number = 0.2;
+
+  constructor(_base: number, bpm: number, envelope: Envelope) {
     this.notes = notesGenerator(_base);
     this.context = new AudioContext();
     this.bpm = bpm;
@@ -49,10 +51,14 @@ export default class Instrument {
     oscillator.frequency.value = this.notes(index);
     oscillator.type = this.waveType;
     const gain = this.context.createGain();
-    this.envelope.setEnvelope(gain, this.context.currentTime, (60000 / this.bpm) * length);
+    this.envelope.setEnvelope(gain.gain, this.context.currentTime, (60000 / this.bpm) * length);
+
+    const masterGain = this.context.createGain();
+    masterGain.gain.value = this.volume;
 
     oscillator.connect(gain);
-    gain.connect(this.context.destination);
+    gain.connect(masterGain);
+    masterGain.connect(this.context.destination);
 
     oscillator.start(0);
     return new Promise((resolve) => {
