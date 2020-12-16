@@ -1,5 +1,5 @@
 import { range } from '../utils';
-import Envelope from './envelope';
+import Envelope from './Envelope';
 
 const pow12 = 2 ** (1 / 12);
 const doremi = [0, 2, 4, 5, 7, 9, 11];
@@ -56,8 +56,7 @@ export default class Instrument {
         this.context.currentTime,
         (60000 / this.bpm) * length,
       );
-    }
-    else gain.gain.value = 1;
+    } else gain.gain.value = 1;
 
     const masterGain = this.context.createGain();
     masterGain.gain.value = this.volume;

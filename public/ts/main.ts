@@ -1,6 +1,6 @@
 /* eslint-disable array-callback-return */
-import Envelope from './instruments/envelope';
-import Instrument from './instruments/instrument';
+import Envelope from './instruments/Envelope';
+import Instrument from './instruments/Instrument';
 import * as musicData from './music';
 
 const envelope = new Envelope();
