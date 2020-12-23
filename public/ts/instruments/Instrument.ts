@@ -1,10 +1,13 @@
 import { range } from '../utils';
 import Envelope from './Envelope';
+import LFO from './LFO';
+import Wave from './Wave';
 
 const pow12 = 2 ** (1 / 12);
 const doremi = [0, 2, 4, 5, 7, 9, 11];
 const sharp = [1, 3, 4, 6, 8, 10, 11];
 
+// 音階を-12から36までの48段階分生成
 const notesGenerator = (_base: number) => {
   const notes = range(-12, 36).map((num) => _base * pow12 ** num);
   return (note) => {
@@ -30,12 +33,26 @@ export default class Instrument {
 
   gainEnvelope?: Envelope;
 
+  lfo: LFO;
+
+  wave: Wave;
+
   public volume: number = 0.2;
 
   constructor(_base: number, bpm: number) {
     this.notes = notesGenerator(_base);
     this.context = new AudioContext();
     this.bpm = bpm;
+  }
+
+  createLFO() {
+    this.lfo = new LFO(this.context);
+    return this.lfo;
+  }
+
+  createWave() {
+    this.wave = new Wave(this.context);
+    return this.wave;
   }
 
   play(index: number, length: number): Promise<void> {
@@ -47,8 +64,13 @@ export default class Instrument {
       });
     }
     const oscillator = this.context.createOscillator();
+
+    if (this.wave) this.wave.setWave(oscillator);
+    else oscillator.type = this.waveType;
+
     oscillator.frequency.value = this.notes(index);
-    oscillator.type = this.waveType;
+    if (this.lfo) this.lfo.connectFrequency(oscillator.frequency);
+
     const gain = this.context.createGain();
     if (this.gainEnvelope) {
       this.gainEnvelope.setEnvelope(
