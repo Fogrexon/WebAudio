@@ -41,43 +41,35 @@ export default class Envelope {
   }
 
   setEnvelope(params: AudioParam, current: number, time: number): void {
-    if (time < this.ADSR.release.time) {
-      // 全部リリース
-      params.linearRampToValueAtTime(
-        this.ADSR.decay.value * (time / this.ADSR.release.time),
-        current,
-      );
-      params.linearRampToValueAtTime(0, current + time);
-      return;
-    }
-    params.linearRampToValueAtTime(0, current);
-    if (time - this.ADSR.release.time < this.ADSR.attack.time) {
+    params.setValueAtTime(0, current);
+
+    if (time < this.ADSR.attack.time) {
       // アタック途中でリリース
       params.linearRampToValueAtTime(
-        sequenceValue(this.ADSR, time - this.ADSR.release.time),
-        current + time - this.ADSR.release.time,
+        sequenceValue(this.ADSR, time),
+        current + time,
       );
       params.setValueAtTime(
         this.ADSR.release.value,
-        current + time - this.ADSR.release.time + EPSILON,
+        current + time + EPSILON,
       );
-      params.linearRampToValueAtTime(0, current + time);
+      params.linearRampToValueAtTime(0, current + time + this.ADSR.release.time);
       return;
     }
 
     params.linearRampToValueAtTime(this.ADSR.attack.value, current + this.ADSR.attack.time);
 
-    if (time - this.ADSR.release.time < this.ADSR.attack.time + this.ADSR.decay.time) {
+    if (time < this.ADSR.attack.time + this.ADSR.decay.time) {
       // ディケイ途中でリリース
       params.linearRampToValueAtTime(
-        sequenceValue(this.ADSR, time - this.ADSR.release.time),
-        current + time - this.ADSR.release.time,
+        sequenceValue(this.ADSR, time),
+        current + time,
       );
       params.setValueAtTime(
         this.ADSR.release.value,
-        current + time - this.ADSR.release.time + EPSILON,
+        current + time + EPSILON,
       );
-      params.linearRampToValueAtTime(0, current + time);
+      params.linearRampToValueAtTime(0, current + time + this.ADSR.release.time);
     }
 
     params.linearRampToValueAtTime(
@@ -86,8 +78,8 @@ export default class Envelope {
     );
     params.linearRampToValueAtTime(
       this.ADSR.decay.value,
-      current + time - this.ADSR.release.time,
+      current + time,
     );
-    params.linearRampToValueAtTime(0, current + time);
+    params.linearRampToValueAtTime(0, current + time + this.ADSR.release.time);
   }
 }

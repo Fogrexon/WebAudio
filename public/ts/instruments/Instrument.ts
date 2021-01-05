@@ -1,6 +1,7 @@
 import { range } from '../utils';
 import Envelope from './Envelope';
 import LFO from './LFO';
+import LowPassFilter from './LowPassFilter';
 import Wave from './Wave';
 
 const pow12 = 2 ** (1 / 12);
@@ -37,6 +38,8 @@ export default class Instrument {
 
   wave?: Wave;
 
+  lowpassfilter?: LowPassFilter;
+
   volume: number = 0.2;
 
   scale: number = 1;
@@ -55,6 +58,11 @@ export default class Instrument {
   createWave() {
     this.wave = new Wave(this.context);
     return this.wave;
+  }
+
+  createLowPassFilter() {
+    this.lowpassfilter = new LowPassFilter(this.context);
+    return this.lowpassfilter;
   }
 
   play(index: number, length: number): Promise<void> {
@@ -87,6 +95,10 @@ export default class Instrument {
 
     oscillator.connect(gain);
     gain.connect(masterGain);
+    if (this.lowpassfilter) {
+      gain.connect(this.lowpassfilter.filter);
+      this.lowpassfilter.connect(masterGain, (60000 / this.bpm) * length);
+    } else gain.connect(masterGain);
     masterGain.connect(this.context.destination);
 
     oscillator.start(0);
