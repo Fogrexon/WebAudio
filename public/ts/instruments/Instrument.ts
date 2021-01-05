@@ -33,11 +33,13 @@ export default class Instrument {
 
   gainEnvelope?: Envelope;
 
-  lfo: LFO;
+  lfo?: LFO;
 
-  wave: Wave;
+  wave?: Wave;
 
-  public volume: number = 0.2;
+  volume: number = 0.2;
+
+  scale: number = 1;
 
   constructor(_base: number, bpm: number) {
     this.notes = notesGenerator(_base);
@@ -68,7 +70,7 @@ export default class Instrument {
     if (this.wave) this.wave.setWave(oscillator);
     else oscillator.type = this.waveType;
 
-    oscillator.frequency.value = this.notes(index);
+    oscillator.frequency.value = this.notes(index) * this.scale;
     if (this.lfo) this.lfo.connectFrequency(oscillator.frequency);
 
     const gain = this.context.createGain();
